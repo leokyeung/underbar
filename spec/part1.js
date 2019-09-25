@@ -107,24 +107,24 @@
 
       it(' should iterate over arrays and provide access to each value', function() {
         var letters = ['a', 'b', 'c'];
-        var iterations = [];
-
-        _.each(letters, function(letter) {
-          iterations.push(letter);
+        var array = [];
+        // running the each function
+        _.each(letters, function(x) {
+          array.push(x);
         });
 
-        expect(iterations).to.eql(['a','b','c']);
+        expect(array).to.eql(['a','b','c']);
       });
 
       it('should iterate over arrays and provide access to each index', function() {
         var letters = ['a', 'b', 'c'];
-        var iterations = [];
+        var output = [];
 
-        _.each(letters, function(letter, index) {
-          iterations.push([letter, index]);
+        _.each(letters, function(value, index) {
+          output.push([value, index]);
         });
 
-        expect(iterations).to.eql([
+        expect(output).to.eql([
           ['a', 0],
           ['b', 1],
           ['c', 2]

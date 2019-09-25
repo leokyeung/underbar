@@ -32,34 +32,43 @@
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-    return n === undefined ? array[0] : array.slice(0, n);
+    if(n === undefined){
+      return array[0];
+    } else{
+      return array.slice(0,n);
+    }
+
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
-    if ( n === 0){
-      return [];
-    }
-    if ( n > array.length){
-      return array;
-    }
-    return n === undefined ? array[array.length-1] : array.slice(n-1, array.length);
+    if( n === undefined) {
+      return array[array.length-1]
+     } else if ( n === 0){
+       return [];
+     } else if ( n > array.length){
+       return array;
+     } else {
+      return array.slice(n-1, array.length)
+     };
   };
 
   // Call iterator(value, key, collection) for each element of collection.
   // Accepts both arrays and objects.
   //
   // Note: _.each does not have a return value, but rather simply runs the
-  // iterator function over each item in the input collection.
-  _.each = function(collection, iterator) {
+  // callback function over each item in the input collection.
+  _.each = function(collection, callBack) {
     if (Array.isArray(collection)){
+      // iterated the whole array
       for( var i = 0; i < collection.length;  i++){
-        iterator(collection[i], i, collection);
+        //apply the callback function on each of the value
+        callBack(collection[i], i, collection);
     }
   } else if ( typeof collection === "object"){
       for ( var key in collection){
-        iterator(collection[key], key, collection);
+        callBack(collection[key], key, collection);
       }
   }
 };
@@ -71,8 +80,15 @@
     // it uses the iteration helper `each`, which you will need to write.
     var result = -1;
 
-    _.each(array, function(item, index) {
-      if (item === target && result === -1) {
+    // for ( var i = 0; i <= array.length; i++){
+    //   if( array[i] === target && result === -1){
+    //     result = i;
+    //   }
+    // }
+    _.each(array, function(value, index) {
+      // if the given value is the same as the target value
+      if (value === target && result === -1) {
+      // replace the result value with the index location
         result = index;
       }
     });
@@ -107,24 +123,35 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, iterator) {
-    var result = [];
-    var iterated = [];
+      var output = [];
+      var obj = {};
 
-    _.each(array, function(item) {
-      if (iterator) {
-        if (!_.contains(iterated, iterator(item))) {
-          iterated.push(iterator(item));
-          result.push(item);
-        }
-      } else {
-        if (!_.contains(result, item)) {
-          result.push(item);
+      if(!isSorted){
+      _.each(array, function(item){
+        // check if input already exisits in output
+        if (!output.includes(item)){
+          output.push(item);
+        } else {
+          // do nothing
         }
       }
-    });
+    );
+  return output;
 
-    return result;
+  } else {
+
+      for ( var i = 0; i< array.length; i++){
+        if (!obj.hasOwnProperty(iterator(array[i]))){
+          obj[iterator(array[i])] = i;
+        }
+      }
+      for ( var key in obj){
+        output.push(array[obj[key]]);
+      }
+      return output;
+    }
   }
+
 
 
   // Return the results of applying an iterator to each element.
@@ -203,15 +230,30 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator) {
+  _.every = function(collection, iterator = _.identity) {
     // TIP: Try re-using reduce() here.
+    return _.reduce(collection, function(truth, item) {
+      if(!iterator(item)) {
+        truth = false;
+      }
+      return truth;
+    },true)
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
   _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    return !_.every(collection, function(element) {
+      if (iterator) {
+      return !iterator(element);
+      } else {
+        return !_.identity(element);
+      }
+    });
+
   };
+
 
 
   /**
@@ -233,11 +275,27 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var keys in arguments[i]) {
+        obj[keys] = arguments[i][keys];
+      }
+    }
+    return obj;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    for (var i = 1; i < arguments.length; i++) {
+      for (var keys in arguments[i]) {
+        if (obj[keys] !== undefined) {
+          obj;
+        } else {
+          obj[keys] = arguments[i][keys];
+        }
+      }
+    }
+    return obj;
   };
 
 
@@ -281,6 +339,8 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+
+
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -290,7 +350,16 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-  };
+    var array = [];
+    for (var i = 2; i < arguments.length; i ++) {
+      array.push(arguments[i])
+    }
+
+    return setTimeout(function () {
+      var result = func.apply(this, array);
+      return result;
+    }, wait);
+};
 
 
   /**
@@ -304,6 +373,15 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var array1 = array.slice();
+    var result = [];
+
+    for (var i = 0; i < array.length; i ++) {
+      var randomNum = Math.floor(Math.random() * array1.length);
+      result.push(array1[randomNum]);
+      array1.splice(randomNum, 1);
+    }
+    return result;
   };
 
 
