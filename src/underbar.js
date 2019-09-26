@@ -137,21 +137,12 @@
   };
 
   // Produce a duplicate-free version of the array.
-  // _.uniq = function(array, isSorted, callBack) {
+  _.uniq = function(array, isSorted, callBack) {
+
   //     var output = [];
   //     var output1 = [];
 
-  //     _.each(array, function(value){
-  //       if(callBack){
-  //         for ( var i = 0; i< array.length; i++){
-  //           if ( !callBack())
-  //         }
-  //       }
-  //     })
-
-  // }
-
- //     if(!isSorted){
+  //    if(!isSorted){
   //     _.each(array, function(item){
   //       // check if input already exisits in output
   //       if (!output.includes(item)){
@@ -161,7 +152,7 @@
   //       }
   //     }
   //   );
-  // return output;
+  //   return output;
 
   // } else {
 
@@ -175,6 +166,7 @@
   //     }
   //     return output;
   //   }
+}
 
   // Return the results of applying an iterator to each element.
   _.map = function(array, callBack) {
@@ -230,29 +222,43 @@
   //     return total + number * number;
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
-  _.reduce = function(collection, callBack, accumulator) {
-    if (accumulator === undefined) {
-      accumulator = _.first(collection);
+  _.reduce = function(collection, callBack, total) {
+
+    if (total === undefined) {
+      total = _.first(collection);
       collection = collection.slice(1);
     }
-    _.each(collection, function(element) {
-        accumulator = callBack(accumulator, element);
-    });
-    return accumulator;
+    //goes over the collection and executes the callback function on total and each value
+    for ( var i = 0; i < collection.length; i++){
+      total = callBack(total, collection[i]);
+    }
+    return total;
  };
 
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
-    // TIP: Many iteration problems can be most easily expressed in
-    // terms of reduce(). Here's a freebie to demonstrate!
-    return _.reduce(collection, function(wasFound, item) {
-      if (wasFound) {
-        return true;
-      }
-      return item === target;
-    }, false);
+    // if collection is an aray
+    return
   };
+    // if (Array.isArray(collection)) {
+    //   for ( var i = 0; i < collection.length; i++){
+    //     if(target === collection[i]){
+    //       return true;
+    //     }else{
+    //       return false;
+    //     }
+    //   }
+    // } else {
+    //   for ( var key in collection){
+    //     if( target === collection[key]){
+    //       return true;
+    //     } else{
+    //       return false;
+    //     }
+    //   }
+    // }
+
 
 
   // Determine whether all of the elements match a truth test.
