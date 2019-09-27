@@ -138,35 +138,32 @@
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array, isSorted, callBack) {
+    var output = [];
+    var iterated = [];
+    if (callBack) {
+      //loops throught the whole array
+      for (var i = 0; i < array.length; i++) {
+        // if iterated array list does not have exisiting value
+        // after running the callBack
+        if (!iterated.includes(callBack(array[i]))) {
+          // push the value to the iterated list
+          // updates the iterated list so it can be continue to be compared
+          iterated.push(callBack(array[i]));
+          //push the same value to the output list
+          output.push(array[i])
+        }
+      }
+    } else {
+      for (var i = 0; i < array.length; i++) {
+        if (!output.includes(array[i])) {
+          output.push(array[i]);
+        }
+      }
+    }
+    return output;
+  };
 
-  //     var output = [];
-  //     var output1 = [];
 
-  //    if(!isSorted){
-  //     _.each(array, function(item){
-  //       // check if input already exisits in output
-  //       if (!output.includes(item)){
-  //         output.push(item);
-  //       } else {
-  //         // do nothing
-  //       }
-  //     }
-  //   );
-  //   return output;
-
-  // } else {
-
-  //     for ( var i = 0; i< array.length; i++){
-  //       if (!obj.hasOwnProperty(iterator(array[i]))){
-  //         obj[iterator(array[i])] = i;
-  //       }
-  //     }
-  //     for ( var key in obj){
-  //       output.push(array[obj[key]]);
-  //     }
-  //     return output;
-  //   }
-}
 
   // Return the results of applying an iterator to each element.
   _.map = function(array, callBack) {
@@ -225,10 +222,12 @@
   _.reduce = function(collection, callBack, total) {
 
     if (total === undefined) {
-      total = _.first(collection);
+      //set memo to be the first item of the array if no memo is passed in
+      total = collection[0];
+      //pass the second item of the array into the iterator first if no memo is passed in
       collection = collection.slice(1);
     }
-    //goes over the collection and executes the callback function on total and each value
+    //iterates over the collection and executes the callback function on total and each value
     for ( var i = 0; i < collection.length; i++){
       total = callBack(total, collection[i]);
     }
