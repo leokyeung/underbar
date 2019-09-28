@@ -219,26 +219,34 @@
   //     return total + number * number;
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
-  _.reduce = function(collection, callBack, total) {
+  _.reduce = function(collection, callBack, accumlator) {
 
-    if (total === undefined) {
-      //set memo to be the first item of the array if no memo is passed in
-      total = collection[0];
+    if (accumlator === undefined) {
+      //set initial to be the first item of the array if no memo is passed in
+      accumlator = collection[0];
       //pass the second item of the array into the iterator first if no memo is passed in
       collection = collection.slice(1);
     }
     //iterates over the collection and executes the callback function on total and each value
-    for ( var i = 0; i < collection.length; i++){
-      total = callBack(total, collection[i]);
-    }
-    return total;
+    _.each(collection, function(value){
+      accumlator = callBack(accumlator, value);
+    })
+
+    return accumlator;
  };
 
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = function(collection, target) {
-    // if collection is an aray
-    return
+
+    return _.reduce(collection, function(wasFound, value) {
+      if (wasFound) {
+        return true;
+      }
+      // matches the value with target
+      return value === target;
+      // set the inital value is false because this is a test to find the value in the collection which changes the accumlator to true
+    }, false);
   };
     // if (Array.isArray(collection)) {
     //   for ( var i = 0; i < collection.length; i++){
@@ -261,28 +269,28 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = function(collection, iterator = _.identity) {
+  _.every = function(collection, callBack = _.identity) {
     // TIP: Try re-using reduce() here.
-    return _.reduce(collection, function(truth, item) {
-      if(!iterator(item)) {
-        truth = false;
+    return _.reduce(collection, function(result, item) {
+      if(!callBack(item)) {
+        result = false;
       }
-      return truth;
+      return result;
     },true)
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = function(collection, iterator) {
-    // TIP: There's a very clever way to re-use every() here.
-    return !_.every(collection, function(element) {
-      if (iterator) {
-      return !iterator(element);
+  _.some = function(array, callBack) {
+
+    // returns TRUE if all of the values in the list pass the predicate FALSE test
+    return !_.every(array, function(value) {
+      if (callBack) {
+      return !callBack(value);
       } else {
-        return !_.identity(element);
+        return !_.identity(value);
       }
     });
-
   };
 
 
@@ -319,9 +327,7 @@
   _.defaults = function(obj) {
     for (var i = 1; i < arguments.length; i++) {
       for (var keys in arguments[i]) {
-        if (obj[keys] !== undefined) {
-          obj;
-        } else {
+        if (obj[keys] == undefined) {
           obj[keys] = arguments[i][keys];
         }
       }
@@ -341,18 +347,13 @@
   // Return a function that can be called at most one time. Subsequent calls
   // should return the previously returned value.
   _.once = function(func) {
-    // TIP: These variables are stored in a "closure scope" (worth researching),
-    // so that they'll remain available to the newly-generated function every
-    // time it's called.
+
     var alreadyCalled = false;
     var result;
 
-    // TIP: We'll return a new function that delegates to the old one, but only
-    // if it hasn't been called before.
     return function() {
       if (!alreadyCalled) {
-        // TIP: .apply(this, arguments) is the standard way to pass on all of the
-        // infromation from one function call to another.
+        // TIP: .apply(this, arguments) is the standard way to pass on all of the info from one function call to another.
         result = func.apply(this, arguments);
         alreadyCalled = true;
       }
@@ -370,8 +371,21 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var obj;
+    var wasCalled = false;
 
-
+    return function () {
+      if (JSON.stringify(obj) === JSON.stringify(arguments)) {
+        wasCalled === true;
+        return obj;
+      }
+      if (!wasCalled) {
+      var result;
+      result = func.apply(this, arguments);
+      obj = arguments;
+      return result;
+      }
+    }
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -381,15 +395,7 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
-    var array = [];
-    for (var i = 2; i < arguments.length; i ++) {
-      array.push(arguments[i])
-    }
-
-    return setTimeout(function () {
-      var result = func.apply(this, array);
-      return result;
-    }, wait);
+    return setTimeout.apply(this, arguments);
 };
 
 
@@ -404,15 +410,21 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    //makes a copy of the array
     var array1 = array.slice();
-    var result = [];
-
+    // empty array to hold result
+    var output = [];
+    // loops through the input array
     for (var i = 0; i < array.length; i ++) {
+      // creating a random number
       var randomNum = Math.floor(Math.random() * array1.length);
-      result.push(array1[randomNum]);
+      // add a random number from the array copy into result
+      output.push(array1[randomNum]);
+      //remove a number out of the copied array list
       array1.splice(randomNum, 1);
     }
-    return result;
+    // output should have all the shuffled number
+    return output;
   };
 
 
